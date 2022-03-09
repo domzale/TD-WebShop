@@ -1,0 +1,57 @@
+version: "3.7"
+
+services:
+  adminer:
+    container_name: adminer
+    image: adminer:latest
+    restart: unless-stopped
+    ports:
+      - 5431:8080
+    networks:
+      - mreza
+
+  postgres:
+    container_name: postgres
+    image: postgres:12.1
+    restart: unless-stopped
+    ports:
+      - 5432:5432
+    networks:
+      - mreza
+    volumes:
+      - "postgres-data:/var/lib/postgresql"
+    environment:
+      POSTGRES_PASSWORD: d0m4z37
+      POSTGRES_USER: trnbus
+      POSTGRES_DB: baza
+
+  backend:
+    container_name: app-backend
+    image: app-backend:latest
+    restart: unless-stopped
+    ports:
+      - 5433:8080
+    networks:
+      - mreza
+    depends_on:
+      - postgres
+
+  frontend:
+    container_name: app-frontend
+    image: app-frontend:latest
+    restart: unless-stopped
+    ports:
+      - 5434:5000
+    networks:
+      - mreza
+    depends_on:
+      - backend
+
+volumes:
+  postgres-data:
+    external: false
+
+networks:
+  mreza:
+    external: false
+    driver: bridge
